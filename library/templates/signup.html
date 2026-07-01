@@ -1,0 +1,312 @@
+{% extends 'base.html' %}
+{% block extra_css %}
+<style>
+  .auth-card {
+    background: rgba(15, 20, 40, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(18px);
+    padding: 2.5rem 2rem;
+  }
+  .auth-card label {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .auth-card .form-control {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff;
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .auth-card .form-control:focus {
+    background: rgba(255,255,255,0.1);
+    border-color: #7c5af6;
+    box-shadow: 0 0 0 3px rgba(124, 90, 246, 0.25);
+    color: #fff;
+  }
+  .auth-card .form-control::placeholder { color: rgba(255,255,255,0.3); }
+  .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0;
+  }
+  .errorlist li {
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .errorlist li::before { content: "⚠"; }
+  .field-hint {
+    color: rgba(255,255,255,0.35);
+    font-size: 0.78rem;
+    margin-top: 3px;
+  }
+  .btn-auth {
+    background: linear-gradient(135deg, #7c5af6, #a855f7);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 700;
+    padding: 0.75rem;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    transition: opacity 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-auth:hover { opacity: 0.9; transform: translateY(-1px); color: #fff; }
+  .btn-auth:active { transform: translateY(0); }
+  .spinner-border-sm { width: 1rem; height: 1rem; display: none; }
+  .btn-auth.loading .btn-text { display: none; }
+  .btn-auth.loading .spinner-border-sm { display: inline-block; }
+  .auth-divider { text-align: center; color: rgba(255,255,255,0.3); font-size: 0.85rem; margin: 1.2rem 0; }
+  .auth-link { color: #a78bfa; text-decoration: none; font-weight: 600; }
+  .auth-link:hover { color: #c4b5fd; text-decoration: underline; }
+  .progress-steps {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+  }
+  .progress-steps span {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.12);
+    transition: background 0.3s;
+  }
+  .progress-steps span.active { background: #7c5af6; }
+  .strength-bar-wrap {
+    height: 5px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .strength-bar {
+    height: 100%;
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.3s, background 0.3s;
+  }
+  .strength-label { font-size: 0.75rem; margin-top: 3px; }
+  .password-rules { list-style: none; padding: 0; margin: 8px 0 0; font-size: 0.78rem; }
+  .password-rules li { color: rgba(255,255,255,0.35); display: flex; align-items: center; gap: 5px; margin-bottom: 2px; }
+  .password-rules li.ok { color: #4ade80; }
+  .password-rules li::before { content: "○"; }
+  .password-rules li.ok::before { content: "✓"; }
+  .section-divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin: 1.2rem 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="min-height: 85vh; display: flex; align-items: center; justify-content: center; padding: 3rem 1rem;">
+  <div style="width: 100%; max-width: 480px;">
+
+    <!-- Header -->
+    <div class="text-center mb-4">
+      <div style="font-size: 2.5rem;">✨</div>
+      <h2 class="text-white fw-bold mt-2 mb-1">Tengeneza Akaunti Yako</h2>
+      <p style="color: rgba(255,255,255,0.45); font-size: 0.9rem;">Jisajili bure — dakika moja tu</p>
+    </div>
+
+    <!-- Progress bar (visual only) -->
+    <div class="progress-steps" id="progressSteps">
+      <span class="active" id="step1"></span>
+      <span id="step2"></span>
+      <span id="step3"></span>
+    </div>
+
+    <div class="auth-card">
+
+      {% if form.non_field_errors %}
+        <div style="background: rgba(255,107,107,0.15); border: 1px solid rgba(255,107,107,0.3); border-radius: 10px; color:#ff6b6b; padding: 0.75rem 1rem; font-size: 0.875rem; margin-bottom: 1rem;">
+          {% for error in form.non_field_errors %}⚠ {{ error }}<br>{% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="POST" id="signupForm">
+        {% csrf_token %}
+
+        <!-- Name row -->
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label for="id_first_name"><i class="bi bi-person me-1"></i>Jina la Kwanza</label>
+            <input type="text" name="first_name" id="id_first_name"
+              class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+              placeholder="Mfano: Amina"
+              value="{{ form.first_name.value|default:'' }}" required>
+            {% if form.first_name.errors %}
+              <ul class="errorlist">{% for e in form.first_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            {% endif %}
+          </div>
+          <div class="col-6">
+            <label for="id_last_name"><i class="bi bi-person me-1"></i>Jina la Mwisho</label>
+            <input type="text" name="last_name" id="id_last_name"
+              class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+              placeholder="Mfano: Musa"
+              value="{{ form.last_name.value|default:'' }}" required>
+            {% if form.last_name.errors %}
+              <ul class="errorlist">{% for e in form.last_name.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label for="id_email"><i class="bi bi-envelope me-1"></i>Barua Pepe (Email)</label>
+          <input type="email" name="email" id="id_email"
+            class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+            placeholder="mfano@gmail.com"
+            value="{{ form.email.value|default:'' }}" required>
+          {% if form.email.errors %}
+            <ul class="errorlist">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+          {% endif %}
+        </div>
+
+        <!-- Username -->
+        <div class="mb-3">
+          <label for="id_username"><i class="bi bi-at me-1"></i>Jina la Mtumiaji (Username)</label>
+          <input type="text" name="username" id="id_username"
+            class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+            placeholder="Mfano: amina_2024"
+            value="{{ form.username.value|default:'' }}"
+            autocomplete="username" required>
+          <p class="field-hint">Tumia herufi, namba na alama _ tu. Hakuna nafasi.</p>
+          {% if form.username.errors %}
+            <ul class="errorlist">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+          {% endif %}
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label for="id_password1"><i class="bi bi-lock me-1"></i>Nywila</label>
+          <input type="password" name="password1" id="id_password1"
+            class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+            placeholder="Tengeneza nywila imara"
+            autocomplete="new-password" required>
+          <!-- Strength meter -->
+          <div class="strength-bar-wrap"><div class="strength-bar" id="strengthBar"></div></div>
+          <p class="strength-label" id="strengthLabel" style="color: rgba(255,255,255,0.35);"></p>
+          <!-- Rules checklist -->
+          <ul class="password-rules" id="passwordRules">
+            <li id="rule-len">Angalau herufi 8</li>
+            <li id="rule-upper">Herufi kubwa moja (A-Z)</li>
+            <li id="rule-num">Namba moja (0-9)</li>
+          </ul>
+          {% if form.password1.errors %}
+            <ul class="errorlist">{% for e in form.password1.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+          {% endif %}
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="mb-4">
+          <label for="id_password2"><i class="bi bi-lock-fill me-1"></i>Thibitisha Nywila</label>
+          <input type="password" name="password2" id="id_password2"
+            class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+            placeholder="Rudia nywila ile ile"
+            autocomplete="new-password" required>
+          <p class="field-hint" id="matchHint"></p>
+          {% if form.password2.errors %}
+            <ul class="errorlist">{% for e in form.password2.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-auth w-100" id="signupBtn">
+          <span class="btn-text"><i class="bi bi-person-check me-1"></i> Jisajili Sasa</span>
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <div class="auth-divider mt-3">
+        Tayari una akaunti? <a href="{% url 'login' %}" class="auth-link">Ingia hapa →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── Password strength meter ──────────────────────────────────────
+  const p1 = document.getElementById('id_password1');
+  const p2 = document.getElementById('id_password2');
+  const bar = document.getElementById('strengthBar');
+  const label = document.getElementById('strengthLabel');
+  const matchHint = document.getElementById('matchHint');
+
+  const ruleLen   = document.getElementById('rule-len');
+  const ruleUpper = document.getElementById('rule-upper');
+  const ruleNum   = document.getElementById('rule-num');
+
+  const step2 = document.getElementById('step2');
+  const step3 = document.getElementById('step3');
+
+  p1.addEventListener('input', function () {
+    const v = p1.value;
+    let score = 0;
+    const hasLen   = v.length >= 8;
+    const hasUpper = /[A-Z]/.test(v);
+    const hasNum   = /[0-9]/.test(v);
+
+    ruleLen.classList.toggle('ok', hasLen);
+    ruleUpper.classList.toggle('ok', hasUpper);
+    ruleNum.classList.toggle('ok', hasNum);
+
+    if (hasLen)   score++;
+    if (hasUpper) score++;
+    if (hasNum)   score++;
+    if (v.length >= 12) score++;
+
+    const levels = [
+      { w: '0%',   bg: 'transparent', txt: '' },
+      { w: '33%',  bg: '#ef4444', txt: '🔴 Dhaifu' },
+      { w: '60%',  bg: '#f59e0b', txt: '🟡 Ya Kati' },
+      { w: '85%',  bg: '#3b82f6', txt: '🔵 Nzuri' },
+      { w: '100%', bg: '#22c55e', txt: '🟢 Imara Sana!' },
+    ];
+    const lvl = levels[Math.min(score, 4)];
+    bar.style.width = lvl.w;
+    bar.style.background = lvl.bg;
+    label.textContent = lvl.txt;
+    label.style.color = lvl.bg;
+
+    step2.classList.toggle('active', score >= 2);
+    checkMatch();
+  });
+
+  p2.addEventListener('input', checkMatch);
+
+  function checkMatch() {
+    if (!p2.value) { matchHint.textContent = ''; return; }
+    if (p1.value === p2.value) {
+      matchHint.textContent = '✓ Nywila zinafanana';
+      matchHint.style.color = '#4ade80';
+      step3.classList.add('active');
+    } else {
+      matchHint.textContent = '✗ Nywila hazifanani';
+      matchHint.style.color = '#f87171';
+      step3.classList.remove('active');
+    }
+  }
+
+  // ── Loading spinner on submit ────────────────────────────────────
+  document.getElementById('signupForm').addEventListener('submit', function () {
+    const btn = document.getElementById('signupBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+  });
+</script>
+{% endblock %}

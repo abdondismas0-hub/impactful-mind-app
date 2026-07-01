@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block extra_css %}
+<style>
+    .course-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        border-radius: 1.25rem;
+        overflow: hidden;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+    }
+
+    .course-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(255, 255, 255, 0.18);
+        box-shadow: 0 12px 32px rgba(99, 102, 241, 0.18) !important;
+    }
+
+    .course-cover-wrapper {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        background-color: rgba(255, 255, 255, 0.02);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .course-cover-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .course-card:hover .course-cover-img {
+        transform: scale(1.06);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5 py-4">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold display-5 text-gradient-primary mb-2">Kozi Zetu Mtandaoni 🎓</h2>
+        <p class="text-secondary">Jifunze ujuzi mpya kupitia kozi zetu zinazofundishwa na wataalamu.</p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+        {% if courses %}
+        {% for course in courses %}
+        <div class="col">
+            <div class="card course-card border-0 shadow-sm">
+                <div class="course-cover-wrapper">
+                    {% if course.cover_image %}
+                    <img src="{{ course.cover_image.url }}" class="course-cover-img" alt="{{ course.title }}">
+                    {% else %}
+                    <div class="w-100 h-100 bg-dark text-white d-flex align-items-center justify-content-center">
+                        <span class="small font-monospace text-secondary">Hakuna Picha</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-body d-flex flex-column p-4">
+                    <h5 class="card-title fw-bold text-white text-truncate mb-2" title="{{ course.title }}">{{ course.title }}</h5>
+                    <p class="card-text text-secondary mb-4 small">{{ course.description|truncatewords:15 }}</p>
+
+                    <div class="mt-auto border-top border-secondary border-opacity-20 pt-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-decoration-line-through text-danger small">Tsh {{ course.price_regular|intcomma }}</small><br>
+                            <span class="text-gradient-secondary fw-bold fs-5">Tsh {{ course.price_number|intcomma }}</span>
+                        </div>
+                        <a href="{% url 'course_detail' course.id %}"
+                            class="btn btn-glass-primary btn-sm rounded-pill px-4 py-2 fw-semibold">Soma Zaidi</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-12 text-center py-5">
+            <div class="card glass-card p-4 d-inline-block px-5 border-0" role="alert">
+                <span class="text-secondary">⏳ Kozi mpya zinakuja hivi punde!</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

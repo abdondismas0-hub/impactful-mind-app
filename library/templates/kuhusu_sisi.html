@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5 mb-5 py-5">
+    {% if about %}
+    <div class="card glass-card glass-card-indigo border-0 p-4 p-md-5">
+        <div class="row align-items-center g-5">
+            <div class="col-md-6">
+                <h1 class="fw-bold text-gradient-primary mb-4">{{ about.title }}</h1>
+                <p class="text-secondary lh-lg fs-5">
+                    {{ about.content|linebreaks }}
+                </p>
+                <a href="{% url 'online_courses' %}" class="btn btn-glass-primary rounded-pill px-4 mt-3">Anza Kujifunza Sasa</a>
+            </div>
+            <div class="col-md-6 text-center">
+                {% if about.image %}
+                <div class="position-relative d-inline-block">
+                    <div class="position-absolute top-50 start-50 translate-middle w-100 h-100" style="z-index: -1; filter: blur(50px); opacity: 0.3; background: var(--secondary-neon); border-radius: 50%;"></div>
+                    <img src="{{ about.image.url }}" class="img-fluid rounded-4 shadow-lg border border-light border-opacity-10" alt="About Us Image" style="max-height: 400px; object-fit: cover;">
+                </div>
+                {% else %}
+                <div class="glass-card d-flex align-items-center justify-content-center"
+                    style="height: 350px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                    <h4 class="text-gradient-secondary">Impactful Mind</h4>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="card glass-card p-5 text-center border-0">
+        <p class="text-muted mb-0">Tafadhali weka maelezo ya ukurasa huu kupitia Admin Dashboard.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% block extra_css %}
+<style>
+  body { background: #0a0d1a; }
+
+  .viewer-header {
+    background: rgba(15,20,40,0.95);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 0.85rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .viewer-header .course-title {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    max-width: 60vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .viewer-header .back-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff;
+    border-radius: 8px;
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+  .viewer-header .back-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+  .viewer-tabs {
+    display: flex;
+    gap: 4px;
+    background: rgba(255,255,255,0.05);
+    padding: 4px;
+    border-radius: 10px;
+    margin: 1rem 1.5rem;
+  }
+  .viewer-tabs button {
+    flex: 1;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: rgba(255,255,255,0.55);
+    background: transparent;
+  }
+  .viewer-tabs button.active {
+    background: linear-gradient(135deg,#7c5af6,#a855f7);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(124,90,246,0.4);
+  }
+
+  /* PDF Viewer */
+  .pdf-container {
+    width: 100%;
+    height: calc(100vh - 160px);
+    border: none;
+    display: block;
+  }
+
+  /* Video Viewer */
+  .video-container {
+    width: 100%;
+    max-width: 960px;
+    margin: 1.5rem auto;
+    padding: 0 1.5rem;
+  }
+  .video-wrapper {
+    position: relative;
+    padding-top: 56.25%;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    border: none;
+  }
+
+  .viewer-section { display: none; }
+  .viewer-section.active { display: block; }
+
+  .download-bar {
+    background: rgba(255,255,255,0.04);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .download-bar span { color: rgba(255,255,255,0.5); font-size: 0.85rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Viewer Header (inside the base navbar's content block) -->
+<div class="viewer-header">
+  <a href="{% url 'course_detail' course.id %}" class="back-btn">
+    <i class="bi bi-arrow-left me-1"></i> Rudi
+  </a>
+  <span class="course-title">{{ course.title }}</span>
+  {% if course.course_file %}
+  <a href="{{ course.course_file.url }}" download
+     class="back-btn" style="background: rgba(14,165,233,0.15); border-color: rgba(14,165,233,0.3);">
+    <i class="bi bi-download me-1"></i> Pakua
+  </a>
+  {% else %}
+  <span></span>
+  {% endif %}
+</div>
+
+<!-- Tabs (only show if course has BOTH) -->
+{% if course.video_url and course.course_file %}
+<div class="viewer-tabs mx-3">
+  <button id="tab-video" class="active" onclick="switchTab('video')">
+    <i class="bi bi-play-circle me-1"></i> Video
+  </button>
+  <button id="tab-pdf" onclick="switchTab('pdf')">
+    <i class="bi bi-file-earmark-pdf me-1"></i> Kitabu / PDF
+  </button>
+</div>
+{% endif %}
+
+<!-- ── VIDEO SECTION ── -->
+{% if course.video_url %}
+<div id="section-video" class="viewer-section {% if course.video_url %}active{% endif %}">
+  <div class="video-container">
+    <div class="video-wrapper">
+      {% if 'youtu.be' in course.video_url or 'youtube.com' in course.video_url %}
+        {# Convert YouTube watch URL to embed #}
+        {% with vid_url=course.video_url %}
+          {% if 'youtu.be/' in vid_url %}
+            <iframe src="https://www.youtube.com/embed/{{ vid_url|cut:'https://youtu.be/' }}"
+                    allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"></iframe>
+          {% else %}
+            {# standard youtube.com/watch?v=ID — use Google's nocookie embed #}
+            <iframe src="{{ vid_url|cut:'watch?v='|cut:'https://www.youtube.com/'|add:'https://www.youtube-nocookie.com/embed/' }}"
+                    allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"></iframe>
+          {% endif %}
+        {% endwith %}
+      {% elif 'drive.google.com' in course.video_url %}
+        <iframe src="{{ course.video_url|cut:'/view?usp=sharing'|add:'/preview' }}"
+                allowfullscreen allow="autoplay"></iframe>
+      {% else %}
+        <iframe src="{{ course.video_url }}" allowfullscreen allow="autoplay"></iframe>
+      {% endif %}
+    </div>
+
+    <div class="mt-4 p-3 rounded-3" style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);">
+      <h5 class="text-white fw-bold mb-1">{{ course.title }}</h5>
+      <p style="color:rgba(255,255,255,0.55); font-size:0.9rem; margin:0;">{{ course.description }}</p>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── PDF / FILE SECTION ── -->
+{% if course.course_file %}
+<div id="section-pdf" class="viewer-section {% if not course.video_url %}active{% endif %}">
+  <iframe
+    src="{{ course.course_file.url }}"
+    class="pdf-container"
+    title="{{ course.title }}"
+  ></iframe>
+  <div class="download-bar">
+    <span><i class="bi bi-file-earmark-pdf me-1"></i> {{ course.title }}</span>
+    <a href="{{ course.course_file.url }}" download
+       class="btn btn-sm rounded-pill px-3 fw-semibold"
+       style="background:linear-gradient(135deg,#0ea5e9,#22d3ee); color:#fff; border:none;">
+      <i class="bi bi-download me-1"></i> Pakua PDF
+    </a>
+  </div>
+</div>
+{% endif %}
+
+{% if not course.video_url and not course.course_file %}
+<div class="text-center py-5">
+  <div style="font-size:3rem;">📭</div>
+  <h5 class="text-white mt-3">Maudhui hayajaongezwa bado</h5>
+  <p style="color:rgba(255,255,255,0.5);">Tafadhali subiri, maudhui ya kozi hii yatafika hivi karibuni.</p>
+  <a href="{% url 'course_detail' course.id %}" class="btn btn-outline-light rounded-pill px-4 mt-2">Rudi Nyuma</a>
+</div>
+{% endif %}
+
+<script>
+function switchTab(tab) {
+    document.querySelectorAll('.viewer-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.viewer-tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById('section-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+}
+</script>
+{% endblock %}

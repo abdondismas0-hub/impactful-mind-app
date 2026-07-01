@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}
+<style>
+    /* Hero Slider custom settings */
+    .hero-slider-section {
+        position: relative;
+        height: 60vh;
+        overflow: hidden;
+        background-color: var(--bg-dark);
+    }
+
+    .hero-slider-section .carousel-item {
+        height: 60vh;
+        position: relative;
+    }
+
+    @media (min-width: 768px) {
+        .hero-slider-section {
+            height: 75vh;
+        }
+
+        .hero-slider-section .carousel-item {
+            height: 75vh;
+        }
+    }
+
+    /* Gradient overlay for slider */
+    .hero-slider-section .carousel-item::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(8, 11, 19, 0.2) 0%, rgba(8, 11, 19, 0.8) 100%);
+        z-index: 1;
+    }
+
+    .hero-slider-section .carousel-item img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        opacity: 0.65;
+    }
+
+    .carousel-caption-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        width: 90%;
+        max-width: 750px;
+        z-index: 2;
+        padding: 3rem;
+        border-radius: 1.5rem;
+    }
+
+    .carousel-caption-container h1 {
+        font-size: 1.8rem !important;
+        font-weight: 800 !important;
+        line-height: 1.2;
+    }
+
+    .carousel-caption-container p {
+        font-size: 0.95rem !important;
+    }
+
+    @media (min-width: 768px) {
+        .carousel-caption-container h1 {
+            font-size: 3.2rem !important;
+        }
+
+        .carousel-caption-container p {
+            font-size: 1.2rem !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <div id="institutionCarousel" class="carousel slide hero-slider-section mb-5" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            {% for slide in slideshow_images %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <img src="{{ slide.picha.url }}" class="d-block w-100" alt="{{ slide.kichwa_cha_habari }}">
+                <div class="carousel-caption-container glass-card glass-card-indigo d-flex flex-column justify-content-center align-items-center">
+                    <h1 class="fw-bold text-gradient-primary mb-3">{{ slide.kichwa_cha_habari }}</h1>
+                    <p class="text-secondary mb-4">{{ slide.maelezo }}</p>
+                    <a href="#dira-nadiama" class="btn btn-glass-secondary px-5 py-3 rounded-pill fw-bold">
+                        Gundua Dira & Dhamira
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% if not slideshow_images %}
+            <div class="carousel-item active">
+                <div class="carousel-caption-container glass-card glass-card-indigo d-flex flex-column justify-content-center align-items-center">
+                    <h1 class="fw-bold text-gradient-primary mb-3">Karibu Kwenye Impactful Mind</h1>
+                    <p class="text-secondary mb-4">Weka picha za taasisi kwenye Admin Panel kuanza.</p>
+                    <a href="{% url 'admin:library_slideshow_add' %}"
+                        class="btn btn-glass-secondary px-5 py-3 rounded-pill fw-bold">
+                        Add Institution Photos
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#institutionCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#institutionCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+    </div>
+
+    <div class="container my-5">
+        <div class="row g-4 mb-5 justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card glass-card glass-card-indigo p-4 border-0 h-100 text-center d-flex flex-column">
+                    <div class="mb-3">
+                        <img src="{% static 'images/books_emoji.png' %}" alt="Books" class="img-fluid" style="width: 80px;">
+                    </div>
+                    <h3 class="fw-bold text-gradient-primary mb-3">Maktaba Stoo</h3>
+                    <p class="text-secondary small mb-4">Pata vitabu mbalimbali vya kitaalamu, biashara na maendeleo binafsi.</p>
+                    <a href="{% url 'maktaba' %}" class="btn btn-glass-outline-indigo w-100 rounded-pill fw-bold mt-auto">Ingia Maktaba</a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-5">
+                <div class="card glass-card glass-card-teal p-4 border-0 h-100 text-center d-flex flex-column">
+                    <div class="mb-3">
+                        <img src="{% static 'images/grad_cap_emoji.png' %}" alt="Courses" class="img-fluid" style="width: 80px;">
+                    </div>
+                    <h3 class="fw-bold text-gradient-secondary mb-3">Kozi Mtandaoni</h3>
+                    <p class="text-secondary small mb-4">Jifunze ujuzi mpya kupitia kozi zetu zinazofundishwa na wataalamu.</p>
+                    <a href="{% url 'online_courses' %}" class="btn btn-glass-outline-teal w-100 rounded-pill fw-bold mt-auto">Tazama Kozi</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="dira-nadiama" class="row justify-content-center g-4 mb-5 pt-4">
+            <div class="col-md-5">
+                <div class="card glass-card glass-card-indigo p-4 text-center h-100 border-0">
+                    <div class="mb-3">
+                        <img src="{% static 'images/lightbulb_emoji.png' %}" alt="Vision" class="img-fluid" style="width: 60px;">
+                    </div>
+                    <h3 class="fw-bold text-gradient-primary mb-3">Dira Yetu</h3>
+                    <p class="text-secondary small mb-0 px-3">{{ site_content.our_vision }}</p>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card glass-card glass-card-teal p-4 text-center h-100 border-0">
+                    <div class="mb-3">
+                        <img src="{% static 'images/dart_board_emoji.png' %}" alt="Mission" class="img-fluid" style="width: 60px;">
+                    </div>
+                    <h3 class="fw-bold text-gradient-secondary mb-3">Dhamira Yetu</h3>
+                    <p class="text-secondary small mb-0 px-3">{{ site_content.our_mission }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-4 justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card glass-card glass-card-indigo p-4 border-0 h-100 text-center d-flex flex-column">
+                    <div class="mb-3">
+                        <img src="{% static 'images/handshake_emoji.png' %}" alt="About" class="img-fluid" style="width: 70px;">
+                    </div>
+                    <h3 class="fw-bold text-gradient-primary mb-3">Kuhusu Sisi</h3>
+                    <p class="text-secondary small mb-4">Fahamu timu iliyo nyuma ya Impactful Mind.</p>
+                    <a href="{% url 'kuhusu_sisi' %}" class="btn btn-glass-outline-indigo w-100 rounded-pill fw-bold mt-auto">Tufahamu Zaidi</a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-5">
+                <div class="card glass-card glass-card-teal p-4 border-0 h-100 text-center d-flex flex-column">
+                    <div class="mb-3">
+                        <img src="{% static 'images/phone_emoji.png' %}" alt="Contact" class="img-fluid" style="width: 70px;">
+                    </div>
+                    <h3 class="fw-bold text-gradient-secondary mb-3">Mawasiliano</h3>
+                    <p class="text-secondary small mb-4">Wasiliana nasi kwa usaidizi, ushauri au ushirikiano.</p>
+                    <a href="{% url 'mawasiliano' %}" class="btn btn-glass-secondary w-100 rounded-pill fw-bold mt-auto">Wasiliana Nasi</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

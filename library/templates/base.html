@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="sw">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impactful Mind | E-Library</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <div class="bg-glow-container">
+        <div class="bg-glow-blob blob-1"></div>
+        <div class="bg-glow-blob blob-2"></div>
+        <div class="bg-glow-blob blob-3"></div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top navbar-glass">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'home' %}">
+                {% if org_data and org_data.navbar_logo %}
+                <img src="{{ org_data.navbar_logo.url }}" alt="{{ org_data.org_name }}" style="height: 40px;" class="me-2">
+                {% else %}
+                <span class="me-2">💡</span>
+                {% endif %}
+                <span class="fw-bold">{{ org_data.org_name|default:"Impactful Mind" }}</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto fw-semibold align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Mwanzo</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'maktaba' %}">Maktaba</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'kuhusu_sisi' %}">kuhusu sisi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'mawasiliano' %}">mawasiliano</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'gundua_zaidi' %}">gundua zaidi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'online_courses' %}">Kozi</a></li>
+
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link text-gradient-secondary fw-bold mx-2" href="{% url 'dashboard' %}">👤 {{ user.username|title }}</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1">Toka</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item ms-2"><a class="btn btn-glass-outline-indigo btn-sm mx-1 rounded-pill"
+                            href="{% url 'login' %}">Ingia</a></li>
+                    <li class="nav-item ms-2"><a class="btn btn-glass-primary btn-sm mx-1 rounded-pill text-white"
+                            href="{% url 'signup' %}">Jisajili</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% block content %}
+    {% endblock %}
+
+    <footer class="text-center py-5 mt-5" style="background: rgba(8, 11, 19, 0.85); border-top: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-secondary);">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 {{ org_data.org_name|default:"Impactful Mind" }}. Haki zote zimehifadhiwa.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

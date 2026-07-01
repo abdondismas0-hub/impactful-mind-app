@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container text-center mt-5 mb-5 py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="fw-bold text-dark mb-3">Gundua Zaidi 🚀</h1>
+            <p class="text-muted fs-5 mb-5 lh-lg">
+                Sehemu hii inakuunganisha na makala, habari mpya, podcast, na matukio mbalimbali yajayo kutoka kwenye
+                mtandao wetu. Endelea kuwa nasi kwa maudhui zaidi ya kusisimua.
+            </p>
+
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'maktaba' %}" class="btn btn-outline-dark rounded-pill px-5">📚 Ingia Maktaba</a>
+                <a href="{% url 'online_courses' %}" class="btn btn-primary rounded-pill px-5 shadow-sm">🎓 Tazama
+                    Kozi</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

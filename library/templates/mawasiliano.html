@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5 mb-5 py-4">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-gradient-primary display-5 mb-2">Wasiliana Nasi 📞</h2>
+        <p class="text-secondary">Tuko hapa kukusaidia wakati wowote.</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-6">
+            <div class="card glass-card glass-card-indigo border-0 p-4 h-100">
+                <h4 class="fw-bold mb-4 text-gradient-primary">Tuandikie Ujumbe</h4>
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-semibold">Jina Lako Kamili</label>
+                        <input type="text" class="form-control form-glass rounded-pill" placeholder="Mf. Abdon">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-semibold">Barua Pepe (Email)</label>
+                        <input type="email" class="form-control form-glass rounded-pill" placeholder="Mf. jina@email.com">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small fw-semibold">Ujumbe Wako</label>
+                        <textarea class="form-control form-glass" rows="4" placeholder="Andika ujumbe wako hapa..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-glass-primary w-100 rounded-pill py-3">Tuma Ujumbe</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card glass-card glass-card-teal border-0 p-4 h-100">
+                <h4 class="fw-bold mb-4 text-gradient-secondary">Kurasa Zetu Za Jamii</h4>
+
+                {% if contact %}
+                <div class="mb-4">
+                    <p class="mb-2 text-secondary"><strong>📧 Barua Pepe:</strong> <span class="text-white">{{ contact.email }}</span></p>
+                    <p class="mb-0 text-secondary"><strong>📞 Simu:</strong> <span class="text-white">{{ contact.phone }}</span></p>
+                </div>
+                <hr class="mb-4">
+
+                <p class="text-secondary small mb-3">Bonyeza mtandao unaotaka kuungana nasi moja kwa moja:</p>
+                <div class="d-grid gap-3">
+                    {% if contact.whatsapp_link %}
+                    <a href="{{ contact.whatsapp_link }}" target="_blank"
+                        class="btn rounded-pill text-start text-white px-4 py-2.5 border-0 shadow-sm"
+                        style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); transition: all 0.3s ease; display: inline-flex; align-items: center;"
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(37, 211, 102, 0.4)';"
+                        onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                        <i class="bi bi-whatsapp me-3 fs-5"></i>
+                        <span>WhatsApp Rasmi</span>
+                    </a>
+                    {% endif %}
+
+                    {% if contact.facebook_link %}
+                    <a href="{{ contact.facebook_link }}" target="_blank"
+                        class="btn rounded-pill text-start text-white px-4 py-2.5 border-0 shadow-sm"
+                        style="background: linear-gradient(135deg, #1877F2 0%, #0d4fa6 100%); transition: all 0.3s ease; display: inline-flex; align-items: center;"
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(24, 119, 242, 0.4)';"
+                        onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                        <i class="bi bi-facebook me-3 fs-5"></i>
+                        <span>Facebook</span>
+                    </a>
+                    {% endif %}
+
+                    {% if contact.instagram_link %}
+                    <a href="{{ contact.instagram_link }}" target="_blank"
+                        class="btn text-start text-white rounded-pill px-4 py-2.5 border-0 shadow-sm"
+                        style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); transition: all 0.3s ease; display: inline-flex; align-items: center;"
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(220, 39, 67, 0.4)';"
+                        onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                        <i class="bi bi-instagram me-3 fs-5"></i>
+                        <span>Instagram</span>
+                    </a>
+                    {% endif %}
+
+                    {% if contact.tiktok_link %}
+                    <a href="{{ contact.tiktok_link }}" target="_blank"
+                        class="btn rounded-pill text-start text-white px-4 py-2.5 border border-secondary border-opacity-30 shadow-sm"
+                        style="background: linear-gradient(135deg, #010101 0%, #111111 100%); transition: all 0.3s ease; display: inline-flex; align-items: center;"
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0, 0, 0, 0.6)';"
+                        onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                        <i class="bi bi-tiktok me-3 fs-5"></i>
+                        <span>TikTok</span>
+                    </a>
+                    {% endif %}
+
+                    {% if contact.x_link %}
+                    <a href="{{ contact.x_link }}" target="_blank"
+                        class="btn rounded-pill text-start text-white px-4 py-2.5 border border-light border-opacity-20 shadow-sm"
+                        style="background: linear-gradient(135deg, #15202b 0%, #000000 100%); transition: all 0.3s ease; display: inline-flex; align-items: center;"
+                        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(255, 255, 255, 0.15)';"
+                        onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                        <i class="bi bi-twitter-x me-3 fs-5"></i>
+                        <span>X (Twitter)</span>
+                    </a>
+                    {% endif %}
+                </div>
+                {% else %}
+                <p class="text-secondary italic">Maelezo ya mitandao bado hayajawekwa kwenye admin dashboard.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

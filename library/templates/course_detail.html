@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container my-5">
+
+    {% if messages %}
+    {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }} alert-dismissible fade show rounded-3" role="alert">
+        {{ msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="row g-5">
+
+        <!-- LEFT: Cover Image -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px;">
+                {% if course.cover_image %}
+                <img src="{{ course.cover_image.url }}" class="img-fluid w-100" alt="{{ course.title }}"
+                    style="object-fit: cover; max-height: 380px;">
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- RIGHT: Course Info -->
+        <div class="col-lg-7 d-flex flex-column justify-content-center">
+            <h1 class="fw-bold mb-3" style="color:#fff;">{{ course.title }}</h1>
+            <p class="lead mb-4" style="color: rgba(255,255,255,0.65);">{{ course.description }}</p>
+
+            <!-- Price box -->
+            <div class="p-4 mb-4"
+                style="background: rgba(255,255,255,0.05); border-left: 4px solid #7c5af6; border-radius: 12px;">
+                <h4 style="color: rgba(255,255,255,0.6);" class="mb-1">
+                    Bei:
+                    <span
+                        class="badge {% if status == 'mwanachama' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                        {{ status|upper }}
+                    </span>
+                </h4>
+                <h2 class="fw-bold" style="color:#fff;">TZS {{ final_price|intcomma }}</h2>
+                {% if status == 'mgeni' %}
+                <p class="small mt-1" style="color:#f87171;">* Jisajili uwe mwanachama kupata kozi kwa TZS {{
+                    course.price_number|intcomma }} tu!</p>
+                {% endif %}
+            </div>
+
+            <!-- ✅ APPROVED: Show course content -->
+            {% if has_access %}
+            <div class="p-3 rounded-3 mb-4 d-flex align-items-center gap-2"
+                style="background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3);">
+                <span style="font-size:1.4rem;">✅</span>
+                <div>
+                    <strong style="color:#4ade80;">Umeidhinishwa!</strong>
+                    <span style="color:rgba(255,255,255,0.6); font-size:0.9rem;"> Unaweza sasa kufikia maudhui ya kozi
+                        hii.</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-flex flex-wrap gap-3 mb-4">
+                {% if course.video_url %}
+                <button id="btnWatch" onclick="toggleContent('videoSection', 'btnWatch')"
+                    class="btn btn-lg px-5 py-3 rounded-pill fw-bold shadow"
+                    style="background: linear-gradient(135deg,#7c5af6,#a855f7); color:#fff; border:none; font-size:1.05rem;">
+                    <i class="bi bi-play-circle-fill me-2"></i> Tazama Sasa
+                </button>
+                {% endif %}
+
+                {% if course.course_file %}
+                <a href="{{ course.course_file.url }}" target="_blank"
+                    class="btn btn-lg px-5 py-3 rounded-pill fw-bold shadow"
+                    style="background: linear-gradient(135deg,#0ea5e9,#22d3ee); color:#fff; border:none; font-size:1.05rem;">
+                    <i class="bi bi-book-fill me-2"></i> Soma Sasa
+                </a>
+                <a href="{{ course.course_file.url }}" download class="btn btn-lg px-4 py-3 rounded-pill fw-bold"
+                    style="background: rgba(255,255,255,0.08); color:#fff; border: 1px solid rgba(255,255,255,0.2); font-size:1.05rem;">
+                    <i class="bi bi-download me-2"></i> Pakua
+                </a>
+                {% endif %}
+            </div>
+
+            {% if not course.video_url and not course.course_file %}
+            <div class="alert alert-info rounded-3">]
+                <div class="bg-white p-4 rounded shadow-sm text-center mt-3">
+                    <h4 class="fw-bold text-dark mb-3">Karibu Darasani!</h4>
+                    <p class="text-muted mb-4">Sasa unaweza kuanza kujifunza au kusoma kitabu chako.</p>
+
+                    <a href="#" class="btn btn-success btn-lg px-5 rounded-pill shadow fw-bold">
+                        <i class="fas fa-book-reader me-2"></i> Anza Kusoma Sasa
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Collapsible Video Player -->
+            {% if course.video_url %}
+            <div id="videoSection" style="display:none;" class="mb-4">
+                <div class="ratio ratio-16x9 rounded-3 overflow-hidden shadow-lg">
+                    {% if 'drive.google.com' in course.video_url %}
+                    <iframe src="{{ course.video_url|cut:'view?usp=sharing'|add:'preview' }}" allowfullscreen
+                        allow="autoplay"></iframe>
+                    {% else %}
+                    <iframe src="{{ course.video_url }}" allowfullscreen allow="autoplay"></iframe>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+
+            <!-- ⏳ PENDING: Waiting for admin approval -->
+            {% elif order_status == 'pending' %}
+            <div class="p-4 rounded-3 text-center mb-3"
+                style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35);">
+                <div style="font-size: 2.5rem;">⏳</div>
+                <h5 class="mt-2 fw-bold" style="color: #fbbf24;">Malipo Yako Yanasubiri Uhakiki</h5>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                    Oda yako imepokelewa na inangoja uhakiki wa msimamizi.
+                    Utapata ufikiaji wa kozi baada ya uthibitisho.
+                    Unaweza kuwasiliana nasi ukihitaji msaada wa haraka.
+                </p>
+            </div>
+
+            <!-- ❌ REJECTED -->
+            {% elif order_status == 'Rejected' %}
+            <div class="p-4 rounded-3 text-center mb-3"
+                style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);">
+                <div style="font-size: 2rem;">❌</div>
+                <h5 class="mt-2 fw-bold" style="color:#f87171;">Oda Ilikataliwa</h5>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">
+                    Oda yako haikuidhinishwa. Tafadhali wasiliana nasi au jaribu tena na namba sahihi ya muamala.
+                </p>
+            </div>
+            <a href="{% url 'checkout' course.id %}" class="btn btn-primary btn-lg px-5 rounded-pill fw-bold">
+                <i class="bi bi-arrow-repeat me-2"></i> Jaribu Tena
+            </a>
+
+            <!-- 🛒 NOT YET ORDERED: Show buy button -->
+            {% else %}
+            <div class="d-flex flex-wrap gap-3 mt-2">
+                {% if user.is_authenticated %}
+                <a href="{% url 'checkout' course.id %}" class="btn btn-lg px-5 py-3 rounded-pill fw-bold shadow"
+                    style="background: linear-gradient(135deg,#7c5af6,#a855f7); color:#fff; border:none;">
+                    <i class="bi bi-cart-check me-2"></i> Lipia na Anza Kozi
+                </a>
+                {% else %}
+                <a href="{% url 'login' %}?next={% url 'course_detail' course.id %}"
+                    class="btn btn-lg px-5 py-3 rounded-pill fw-bold shadow"
+                    style="background: linear-gradient(135deg,#7c5af6,#a855f7); color:#fff; border:none;">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Ingia Kwanza
+                </a>
+                {% endif %}
+                <a href="{% url 'online_courses' %}" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill">
+                    Rudi Kwenye Orodha
+                </a>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleContent(sectionId, btnId) {
+        const section = document.getElementById(sectionId);
+        const btn = document.getElementById(btnId);
+        if (!section) return;
+        const isHidden = section.style.display === 'none';
+        section.style.display = isHidden ? 'block' : 'none';
+        if (btn) {
+            if (isHidden) {
+                btn.innerHTML = '<i class="bi bi-x-circle me-2"></i> Ficha Video';
+                btn.style.background = 'rgba(255,255,255,0.1)';
+            } else {
+                btn.innerHTML = '<i class="bi bi-play-circle-fill me-2"></i> Tazama Sasa';
+                btn.style.background = 'linear-gradient(135deg,#7c5af6,#a855f7)';
+            }
+        }
+    }
+</script>
+{% endblock %}

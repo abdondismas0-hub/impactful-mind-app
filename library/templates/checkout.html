@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card impactful-card-premium p-4 shadow">
+                <h3 class="fw-bold mb-4 text-center">Malipo ya Kozi</h3>
+
+                <div class="alert alert-info">
+                    <strong>Kozi:</strong> {{ course.title }}<br>
+                    <strong>Kiasi cha Kulipia:</strong> TZS {{ final_price }}
+                </div>
+
+                <div class="bg-light p-3 rounded mb-4 border">
+                    <h5 class="fw-bold text-success"><i class="fas fa-money-bill-wave"></i> Jinsi ya Kulipia (M-PESA /
+                        Tigo Pesa)</h5>
+                    <ol class="small text-muted mb-0">
+                        <li>Nenda kwenye menyu ya mtandao wako (M-Pesa au Tigo Pesa).</li>
+                        <li>Chagua <strong>Tuma Pesa</strong>.</li>
+                        <li>Weka Namba: <strong>07XX XXX XXX</strong> (Weka namba yako hapa).</li>
+                        <li>Weka Kiasi: <strong>TZS {{ final_price }}</strong>.</li>
+                        <li>Thibitisha malipo kwenda kwa <strong>JINA LAKO / IMPACTFUL MIND</strong>.</li>
+                        <li>Ukishamaliza, utapokea SMS yenye <strong>Namba ya Muamala</strong> (Mfano: 8A4B9C...). Iweke
+                            hapa chini.</li>
+                    </ol>
+                </div>
+
+                <form method="POST" action="{% url 'checkout' course.id %}">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="transaction_id" class="form-label fw-bold">Namba ya Muamala (Transaction ID)</label>
+                        <input type="text" name="transaction_id" class="form-control form-control-lg text-uppercase"
+                            placeholder="Mfn: 8A4B9C102J" required>
+                        <div class="form-text">Tafadhali hakikisha umeandika namba sahihi kama ilivyo kwenye meseji yako
+                            kuepuka ucheleweshaji.</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold">Thibitisha Malipo
+                            Yangu</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

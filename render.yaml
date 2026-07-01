@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: impactful-mind-app
+    env: python
+    plan: free
+    pythonVersion: 3.11
+    buildCommand: pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+    startCommand: gunicorn impactful_mind.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: DISABLE_COLLECTSTATIC
+        value: "false"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: impactful-mind-db
+          property: connectionString
+    
+databases:
+  - name: impactful-mind-db
+    engine: postgresql
+    plan: free
